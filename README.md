@@ -5,13 +5,13 @@
 
 Term: Spring 2019
 
-+ Team ##
-+ Team members
-	+ team member 1
-	+ team member 2
-	+ team member 3
-	+ team member 4
-	+ team member 5
+## Team 5
+
+- Chen, Xinyi xc2464@columbia.edu
+- Dubova, Elena ed2801@columbia.edu
+- Hu, Xinyi xh2383@columbia.edu
+- Ma, Qiaozhen qm2138@columbia.edu
+- Xiao, Caihui cx2225@columbia.edu
 
 + Project summary: In this project, we created a classification engine for enhance the resolution of images. 
 	
