@@ -86,6 +86,14 @@ plt.imshow(x_train_hr[0], interpolation='nearest')
 #### STEP 5: TEST ON HOLDOUT SET
 
 start_4 = time.time()
+
+test_im = generator_train.evaluate(x_test_lr, x_test_hr)
+gen_imgs = generator_train.predict(x_train_lr)
+
+gen_img = gen_imgs[0]
+result = plt.imshow(gen_img, interpolation='nearest')
+
+
 end_4 = time.time()
 
 #### SUMMARISE RUNNING TIME

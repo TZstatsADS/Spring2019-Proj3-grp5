@@ -18,13 +18,13 @@ def train(epochs, batch_size):
     adam = Adam(lr=1E-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
     
     generator.compile(loss='mean_squared_error', optimizer=adam)
-    generated_images_sr = generator.fit(x_train_lr, x_train_hr, batch_size = batch_size, validation_split = 0.2, epochs = epochs)
-    test_im = generator.evaluate(x_test_lr, x_test_hr)
-    gen_imgs = generator.predict(x_train_lr)
-    
-    gen_img = gen_imgs[0]
-    result = plt.imshow(gen_img, interpolation='nearest')
+    generator.summary()
+    generated_train = generator.fit(x_train_lr, x_train_hr, batch_size = batch_size, validation_split = 0.2, epochs = epochs)
+    loss = generated_train.history['loss']
+    val_loss = generated_train.history['val_loss']
     
     generator.save("D:\\models\\model%d.h5" %epochs)
+    generator.save_weights("D:\\models\\weights_model%d.h5" %epochs)
+    
+    return generator, generator_train, loss, val_loss
 
-    return gen_imgs, result
