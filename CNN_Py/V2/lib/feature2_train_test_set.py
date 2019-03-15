@@ -29,9 +29,10 @@ def train_test_data(imgs, number_of_images = 2200, train_test_ratio = 0.9):
     x_test = imgs[number_of_train_images:number_of_images]
     
     x_train_hr = hr_images(x_train)
+    
     x_test_hr = hr_images(x_test)
+    x_test_lr = lr_images(x_test, 4)
     
     x_train_lr = lr_images(x_train, 4)
-    x_test_lr = lr_images(x_test, 4)
     
     return x_train_lr, x_train_hr, x_test_lr, x_test_hr

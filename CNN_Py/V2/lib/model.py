@@ -7,17 +7,17 @@ Created on Thu Mar 14 23:21:36 2019
 """
 
 # Modules
-from keras.layers import Dense
-from keras.layers.core import Activation
-from keras.layers.normalization import BatchNormalization
-from keras.layers.convolutional import UpSampling2D
-from keras.layers.core import Flatten
-from keras.layers import Input
-from keras.layers.convolutional import Conv2D, Conv2DTranspose
-from keras.models import Model
-from keras.layers.advanced_activations import LeakyReLU, PReLU
-from keras.layers import add
-from keras.optimizers import Adam
+from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.layers.core import Activation
+from tensorflow.python.keras.layers.normalization import BatchNormalization
+from tensorflow.python.keras.layers.convolutional import UpSampling2D
+from tensorflow.python.keras.layers.core import Flatten
+from tensorflow.python.keras.layers import Input
+from tensorflow.python.keras.layers.convolutional import Conv2D, Conv2DTranspose
+from tensorflow.python.keras.models import Model
+from tensorflow.python.keras.layers.advanced_activations import LeakyReLU, PReLU
+from tensorflow.python.keras.layers import add
+from tensorflow.python.keras.optimizers import Adam
 
 
 # Residual block
