@@ -1,0 +1,194 @@
+---
+title: "Baseline_main"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+```{r}
+if(!require("EBImage")){
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("EBImage")
+}
+
+if(!require("gbm")){
+  install.packages("gbm")
+}
+
+if(!require("caret")){
+  install.packages("caret")
+}
+
+library("EBImage")
+library("gbm")
+```
+
+
+### Step 0: specify directories.
+
+Set the working directory to the image folder. Specify the training and the testing set. For data without an independent test/validation set, you need to create your own testing data by random subsampling. In order to obain reproducible results, set.seed() whenever randomization is used. 
+
+```{r}
+set.seed(2019)
+```
+
+```{r}
+train_dir <- "../data/train_set/"
+train_LR_dir <- paste(train_dir, "LR/", sep="")
+train_HR_dir <- paste(train_dir, "HR/", sep="")
+train_label_path <- paste(train_dir, "label.csv", sep="") 
+```
+
+### Step 1: set up controls for evaluation experiments.
+
+In this chunk, we have a set of controls for the evaluation experiments. 
+
++ (T/F) cross-validation on the training set
++ (number) K, the number of CV folds
++ (T/F) process features for training set
++ (T/F) run evaluation on an independent test set
++ (T/F) process features for test set
+
+
+```{r}
+run.cv=TRUE # run cross-validation on the training set
+K <- 5  # number of CV folds
+run.feature.train=TRUE # process features for training set
+run.test=TRUE # run evaluation on an independent test set
+run.feature.test=TRUE # process features for test set
+```
+
+
+Setup the parameters
+```{r}
+# df -  is the feature combinations for baseline gbm
+df <- data.frame(matrix(ncol = 3, nrow = 36))
+x <- c("numTrees", "minNode", "shrinkage")
+colnames(df) <- x
+
+numTrees = seq(60, 110, 20) 
+minNode = seq(5, 15, 3)
+shrinkage = seq(0.05, 0.1, 0.02)
+
+df$numTrees <- rep(numTrees, each = length(minNode)*length(shrinkage))
+df$minNode <- rep(rep(minNode, each = length(shrinkage)), length(numTrees))
+df$shrinkage <- rep(shrinkage, length(numTrees)*length(minNode))
+
+model_values <- df
+```
+
+Classify the training set by different labels
+```{r}
+labels <- read.csv(train_label_path)
+```
+
+```{r}
+getimg <- function(label, direc){
+  temp <- labels %>% filter(Label==label) %>% select(Image)
+  temp <- as.character(temp$Image)
+  
+  imgLR <- list()
+  for(i in 1:length(df)){
+  imgLR0 <- as.array(readImage(paste0(direc,  "img_", temp[i])))
+  imgLR[[i]] <- imgLR0
+  }
+  return(imgLR)
+}
+
+imgLR_0 <- getimg(0, train_LR_dir)
+imgLR_1 <- getimg(1, train_LR_dir)
+imgLR_2 <- getimg(2, train_LR_dir)
+
+imgHR_0 <- getimg(0, train_HR_dir)
+imgHR_1 <- getimg(1, train_HR_dir)
+imgHR_2 <- getimg(2, train_HR_dir)
+
+```
+
+Save the LR, HR img information in different RData files.
+```{r}
+# save(imgLR_0,imgLR_1,imgLR_2,file = "imgLR.RData")
+# save(imgHR_0,imgHR_1,imgHR_2,file = "imgHR.RData")
+```
+
+
+### Step 2: import training images class labels.
+
+We provide extra information of image label: car (0), flower (1), market (2). These labels are not necessary for your model.
+
+```{r train_label}
+extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
+```
+
+### Step 3: construct features and responses
+
+`feature.R` should be the wrapper for all your feature engineering functions and options. The function `feature( )` should have options that correspond to different scenarios for your project and produces an R object that contains features and responses that are required by all the models you are going to evaluate later. 
++ `feature.R`
+  + Input: a path for low-resolution images.
+  + Input: a path for high-resolution images.
+  + Output: an RData file that contains extracted features and corresponding responses
+
+```{r feature}
+source("../lib/feature.R")
+
+tm_feature_train <- NA
+if(run.feature.train){
+  tm_feature_train <- system.time(dat_train <- feature(train_LR_dir, train_HR_dir))
+  feat_train <- dat_train$feature
+  label_train <- dat_train$label
+}
+
+#save(dat_train, file="../output/feature_train.RData")
+```
+
+
+### Step 4: Train a classification model with training images
+Call the train model and test model from library. 
+
+`train.R` and `test.R` should be wrappers for all your model training steps and your classification/prediction steps. 
++ `train.R`
+  + Input: a path that points to the training set features and responses.
+  + Output: an RData file that contains trained classifiers in the forms of R objects: models/settings/links to external trained configurations.
++ `test.R`
+  + Input: a path that points to the test set features.
+  + Input: an R object that contains a trained classifier.
+  + Output: an R object of response predictions on the test set. If there are multiple classifiers under evaluation, there should be multiple sets of label predictions. 
+```{r loadlib}
+source("../lib/train_baseline.R")
+source("../lib/test_baseline.R")
+```
+
+
+#### Model selection with cross-validation
+* Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
+```{r runcv, message=FALSE, warning=FALSE}
+source("../lib/cross_validation_baseline.R")
+
+if(run.cv){
+  err_cv <- array(dim=c(nrow(model_values), 2))
+  for(k in 1:nrow(model_values)){
+    print(paste('Currently evaluating parameter combination ', k))
+    
+    cat("k=", k, "\n")
+    err_cv[k,] <- cv.function(feat_train, label_train,  K, depth = 1, 
+                              numTrees = model_values$numTrees[k] , 
+                              minNode = model_values$minNode[k] , 
+                              shrinkage = model_values$shrinkage[k])  
+  }
+  save(err_cv, file="../output/err_cv_baseline.RData")
+}
+```
+
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
