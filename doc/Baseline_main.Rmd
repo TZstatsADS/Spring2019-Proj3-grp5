@@ -5,7 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(dplyr)
+#library(dplyr)
 ```
 
 ```{r}
@@ -86,12 +86,13 @@ labels <- read.csv(train_label_path)
 ```
 
 ```{r}
+library(dplyr)
 getimg <- function(label, direc){
   temp <- labels %>% filter(Label==label) %>% select(Image)
   temp <- as.character(temp$Image)
   
   imgLR <- list()
-  for(i in 1:length(df)){
+  for(i in 1:length(temp)){
   imgLR0 <- as.array(readImage(paste0(direc,  "img_", temp[i])))
   imgLR[[i]] <- imgLR0
   }
@@ -110,8 +111,8 @@ imgHR_2 <- getimg(2, train_HR_dir)
 
 Save the LR, HR img information in different RData files.
 ```{r}
-# save(imgLR_0,imgLR_1,imgLR_2,file = "imgLR.RData")
-# save(imgHR_0,imgHR_1,imgHR_2,file = "imgHR.RData")
+save(imgLR_0,imgLR_1,imgLR_2,file = "imgLR.RData")
+save(imgHR_0,imgHR_1,imgHR_2,file = "imgHR.RData")
 ```
 
 
