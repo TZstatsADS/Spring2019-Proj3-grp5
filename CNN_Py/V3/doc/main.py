@@ -12,6 +12,8 @@ Contains ALL COMPUTATIONAL STEPS
 
 # Utils
 
+import time
+
 start_1 = time.time()
 
 import os
@@ -20,7 +22,6 @@ import numpy as np
 from numpy import array
 import random
 import math
-import time
 
 # Images resizing
 
@@ -68,19 +69,30 @@ start_2 = time.time()
  
 hr_paths = get_paths("HR")
 HR_cropped = cropped_imgs(hr_paths)
-x_train_lr, x_train_hr, x_test_lr, x_test_hr = train_test_data(HR_cropped, number_of_images = 900)
+x_train_lr, x_train_hr, x_test_lr, x_test_hr = train_test_data(HR_croppedS)
+
+x_train_lr = ndarray_to_4dim(x_train_lr, image_size = 8)
+x_train_hr = ndarray_to_4dim(x_train_hr, image_size = 32)
+x_test_lr = ndarray_to_4dim(x_test_lr, image_size = 8)
+x_test_hr = ndarray_to_4dim(x_test_hr, image_size = 32)
 
 end_2 = time.time()
 #ex = x_train_hr[0]
 #### STEP 4a: TRAIN MODEL
 start_3 = time.time()
 
-epochs = 40
+epochs = 5
 batch_size = 10
 
 generator, generated_train, loss, val_loss = train(epochs = epochs, batch_size = batch_size)
 
 end_3 = time.time()
+
+image_shape = (8,8,3)
+generator = Generator(image_shape).generator()
+adam = Adam(lr=1E-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+generator.compile(loss='mean_squared_error', optimizer=adam)
+generator.load_weights("D:\\models\\model50.h5")
 
 #### STEP 4b: CROSS-VALIDATION AND PARAMETER TUNING (performance results visualized, best model chosed)
 epochs = range(epochs)
@@ -94,6 +106,8 @@ plt.show()
 #### STEP 5: TEST ON HOLDOUT SET
 
 start_4 = time.time()
+
+
 
 test_im = generator.evaluate(x_test_lr, x_test_hr)
 
@@ -109,14 +123,14 @@ gen_imgs = generator.predict(x_test_lr)
 
 
 type(gen_imgs)
-gen_img = gen_imgs[209]
+gen_img = gen_imgs[20]
 result = plt.imshow(gen_img, interpolation='nearest')
 
-plt.imshow(x_test_hr[209], interpolation='nearest')
-plt.imshow(x_test_lr[209], interpolation='nearest')
+plt.imshow(x_test_hr[20], interpolation='nearest')
+plt.imshow(x_test_lr[20], interpolation='nearest')
 
 psnr_list = []
-for i in range(219):
+for i in range(len(gen_imgs)):
     psnr_item = psnr(gen_imgs[i], x_test_hr[i])
     psnr_list.append(psnr_item)
     
@@ -125,6 +139,8 @@ plt.plot(psnr_list, 'bo', label='Test(PSNR)')
 plt.title('Test(PSNR)')
 plt.legend()
 plt.show()
+
+np.mean(psnr_list)
     
 #psnr_1 = psnr(gen_imgs[0], x_test_hr[0])
 

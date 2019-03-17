@@ -6,7 +6,7 @@ Created on Sun Mar 10 19:58:28 2019
 @author: elena
 """
 
-import numpy 
+import numpy as np 
 import math
 import cv2
 

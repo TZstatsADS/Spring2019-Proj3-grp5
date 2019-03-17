@@ -36,3 +36,11 @@ def train_test_data(imgs, number_of_images = 2200, train_test_ratio = 0.9):
     x_train_lr = lr_images(x_train, 4)
     
     return x_train_lr, x_train_hr, x_test_lr, x_test_hr
+
+def ndarray_to_4dim(ndarray, image_size = 8):
+    four_dim = np.empty([len(ndarray), image_size, image_size, 3])
+    for i in range(len(ndarray)):
+        if ndarray[i].shape == (8,8,3):
+            four_dim[i] = ndarray[i]
+        
+    return four_dim
