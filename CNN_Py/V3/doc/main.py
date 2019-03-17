@@ -75,24 +75,58 @@ end_2 = time.time()
 #### STEP 4a: TRAIN MODEL
 start_3 = time.time()
 
-train(epochs = 40, batch_size = 10)
+epochs = 40
+batch_size = 10
+
+generator, generated_train, loss, val_loss = train(epochs = epochs, batch_size = batch_size)
 
 end_3 = time.time()
-#### STEP 4b: CROSS-VALIDATION AND PARAMETER TUNING (performance results visualized, best model chosed)
 
-plt.imshow(x_train_lr[0], interpolation='nearest')
-plt.imshow(x_train_hr[0], interpolation='nearest')
+#### STEP 4b: CROSS-VALIDATION AND PARAMETER TUNING (performance results visualized, best model chosed)
+epochs = range(epochs)
+plt.figure()
+plt.plot(epochs, loss, 'bo', label='Training loss')
+plt.plot(epochs, val_loss, 'r+', label='Validation loss')
+plt.title('Training and validation loss')
+plt.legend()
+plt.show()
 
 #### STEP 5: TEST ON HOLDOUT SET
 
 start_4 = time.time()
 
-test_im = generator_train.evaluate(x_test_lr, x_test_hr)
-gen_imgs = generator_train.predict(x_train_lr)
+test_im = generator.evaluate(x_test_lr, x_test_hr)
 
-gen_img = gen_imgs[0]
+type(test_im)
+
+plt.figure()
+plt.plot(test_im, 'bo', label='Trest loss')
+plt.title('Test loss')
+plt.legend()
+plt.show()
+
+gen_imgs = generator.predict(x_test_lr)
+
+
+type(gen_imgs)
+gen_img = gen_imgs[209]
 result = plt.imshow(gen_img, interpolation='nearest')
 
+plt.imshow(x_test_hr[209], interpolation='nearest')
+plt.imshow(x_test_lr[209], interpolation='nearest')
+
+psnr_list = []
+for i in range(219):
+    psnr_item = psnr(gen_imgs[i], x_test_hr[i])
+    psnr_list.append(psnr_item)
+    
+plt.figure()
+plt.plot(psnr_list, 'bo', label='Test(PSNR)')
+plt.title('Test(PSNR)')
+plt.legend()
+plt.show()
+    
+#psnr_1 = psnr(gen_imgs[0], x_test_hr[0])
 
 end_4 = time.time()
 
@@ -102,3 +136,8 @@ lib_download_time = end_1 - start_1
 data_prep_time = end_2 - start_2
 train_time = end_3 - start_3
 test_time = end_4 - start_4
+
+print("Loading libraries takes: ", lib_download_time)
+print("Preparing data for training the model takes: ", data_prep_time)
+print("Training time: ", train_time)
+print("Testing time: ", test_time)

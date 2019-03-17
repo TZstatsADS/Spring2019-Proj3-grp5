@@ -23,8 +23,11 @@ def train(epochs, batch_size):
     loss = generated_train.history['loss']
     val_loss = generated_train.history['val_loss']
     
-    generator.save("D:\\models\\model%d.h5" %epochs)
-    generator.save_weights("D:\\models\\weights_model%d.h5" %epochs)
+    generator.save("V3/output/model%d.h5" %epochs)
+    generator.save_weights("V3/output/weights_model%d.h5" %epochs)
     
-    return generator, generator_train, loss, val_loss
+    return generator, generated_train, loss, val_loss
 
+#generator.save("D:\\models\\model%d.h5" %epochs)
+#generator.save_weights("D:\\models\\weights_model%d.h5" %epochs)
+    

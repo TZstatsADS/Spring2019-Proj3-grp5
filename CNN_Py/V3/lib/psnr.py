@@ -12,7 +12,7 @@ import cv2
 
 
 def psnr(img1, img2):
-    mse = numpy.mean( (img1 - img2) ** 2 )
+    mse = np.mean( (img1 - img2) ** 2 )
     if mse == 0:
         return 100
     PIXEL_MAX = 1.0 #255.0 for normalized images
