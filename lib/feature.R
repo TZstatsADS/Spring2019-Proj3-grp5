@@ -17,7 +17,7 @@ feature <- function(imgLR, imgHR, n_points=1000){
   }
   
   
-  get_label <- function(HR_col_idx, HR_row_idx, HR_image = imgHR_temp, padd_LRimage = imgLR_padded){
+  get_label <- function(HR_col_idx, HR_row_idx, HR_image = imgHR_temp, padd_LRimage = imgLR_temp){
     lable_array <- array(0, c(4,3))
     lable_4points <- HR_image[c(HR_row_idx-1, HR_row_idx), c(HR_col_idx-1, HR_col_idx), ]
     HR_t <- lable_4points - rep(padd_LRimage[HR_row_idx/2+1, HR_col_idx/2+1, ], each=4)
@@ -37,8 +37,8 @@ feature <- function(imgLR, imgHR, n_points=1000){
   for(i in 1:n_files){
    
     ### step 1. sample n_points from imgLR
-    row_idx <- sample(dim(imgLR[[1]])[1], n_points, replace = TRUE)
-    col_idx <- sample(dim(imgLR[[1]])[2], n_points, replace = TRUE)
+    row_idx <- sample(dim(imgLR[[i]])[1], n_points, replace = TRUE)
+    col_idx <- sample(dim(imgLR[[i]])[2], n_points, replace = TRUE)
     HR_ridx <- 2*row_idx
     HR_cidx <- 2*col_idx
     
@@ -62,4 +62,3 @@ feature <- function(imgLR, imgHR, n_points=1000){
   }
   return(list(feature = featMat, label = labMat))
 }
-feature()

@@ -65,13 +65,14 @@ run.feature.test=TRUE # process features for test set
 Setup the parameters
 ```{r}
 # df -  is the feature combinations for baseline gbm
-df <- data.frame(matrix(ncol = 3, nrow = 36))
+df <- data.frame(matrix(ncol = 3, nrow = 27))
 x <- c("numTrees", "minNode", "shrinkage")
 colnames(df) <- x
 
-numTrees = seq(60, 110, 20) 
-minNode = seq(5, 15, 3)
-shrinkage = seq(0.05, 0.1, 0.02)
+numTrees = seq(80, 100, 10) 
+minNode = seq(30, 50, 10)
+shrinkage = seq(0.16, 0.2, 0.02)
+
 
 df$numTrees <- rep(numTrees, each = length(minNode)*length(shrinkage))
 df$minNode <- rep(rep(minNode, each = length(shrinkage)), length(numTrees))
@@ -79,6 +80,10 @@ df$shrinkage <- rep(shrinkage, length(numTrees)*length(minNode))
 
 model_values <- df
 ```
+
+### Step 2: import training images class labels.
+
+We provide extra information of image label: car (0), flower (1), market (2). These labels are not necessary for your model.
 
 Classify the training set by different labels
 ```{r}
@@ -115,14 +120,12 @@ save(imgLR_0,imgLR_1,imgLR_2,file = "imgLR.RData")
 save(imgHR_0,imgHR_1,imgHR_2,file = "imgHR.RData")
 ```
 
-
-### Step 2: import training images class labels.
-
-We provide extra information of image label: car (0), flower (1), market (2). These labels are not necessary for your model.
-
-```{r train_label}
-extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
+```{r}
+load("imgLR.RData")
+load("imgHR.RData")
 ```
+
+
 
 ### Step 3: construct features and responses
 
@@ -137,12 +140,33 @@ source("../lib/feature.R")
 
 tm_feature_train <- NA
 if(run.feature.train){
-  tm_feature_train <- system.time(dat_train <- feature(train_LR_dir, train_HR_dir))
-  feat_train <- dat_train$feature
-  label_train <- dat_train$label
+  tm_feature_train <- system.time(dat_train <- feature(imgLR_0, imgHR_0))
+  feat_train0 <- dat_train$feature
+  label_train0 <- dat_train$label
 }
 
-#save(dat_train, file="../output/feature_train.RData")
+save(dat_train, file="../output/feature_train0.RData")
+```
+
+```{r}
+tm_feature_train <- NA
+if(run.feature.train){
+  tm_feature_train <- system.time(dat_train <- feature(imgLR_1, imgHR_1))
+  feat_train1 <- dat_train$feature
+  label_train1 <- dat_train$label
+}
+
+save(dat_train, file="../output/feature_train1.RData")
+```
+
+```{r}
+if(run.feature.train){
+  tm_feature_train <- system.time(dat_train <- feature(imgLR_2, imgHR_2))
+  feat_train2 <- dat_train$feature
+  label_train2 <- dat_train$label
+}
+
+save(dat_train, file="../output/feature_train1.RData")
 ```
 
 
@@ -165,6 +189,7 @@ source("../lib/test_baseline.R")
 
 #### Model selection with cross-validation
 * Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
+If the interaction depth for GBM is large, it is time consuming, we set depth = 1.
 ```{r runcv, message=FALSE, warning=FALSE}
 source("../lib/cross_validation_baseline.R")
 
@@ -174,12 +199,45 @@ if(run.cv){
     print(paste('Currently evaluating parameter combination ', k))
     
     cat("k=", k, "\n")
-    err_cv[k,] <- cv.function(feat_train, label_train,  K, depth = 1, 
+    err_cv[k,] <- cv.function(feat_train0, label_train0,  K, depth = 1, 
                               numTrees = model_values$numTrees[k] , 
                               minNode = model_values$minNode[k] , 
                               shrinkage = model_values$shrinkage[k])  
   }
-  save(err_cv, file="../output/err_cv_baseline.RData")
+  save(err_cv, file="../output/err_cv_baseline0.RData")
+}
+```
+
+```{r runcv, message=FALSE, warning=FALSE}
+if(run.cv){
+  err_cv <- array(dim=c(nrow(model_values), 2))
+  for(k in 1:nrow(model_values)){
+    print(paste('Currently evaluating parameter combination ', k))
+    
+    cat("k=", k, "\n")
+    err_cv[k,] <- cv.function(feat_train1, label_train1,  K, depth = 1, 
+                              numTrees = model_values$numTrees[k] , 
+                              minNode = model_values$minNode[k] , 
+                              shrinkage = model_values$shrinkage[k])  
+  }
+  save(err_cv, file="../output/err_cv_baseline1.RData")
+}
+```
+
+
+```{r runcv, message=FALSE, warning=FALSE}
+if(run.cv){
+  err_cv <- array(dim=c(nrow(model_values), 2))
+  for(k in 1:nrow(model_values)){
+    print(paste('Currently evaluating parameter combination ', k))
+    
+    cat("k=", k, "\n")
+    err_cv[k,] <- cv.function(feat_train2, label_train2,  K, depth = 1, 
+                              numTrees = model_values$numTrees[k] , 
+                              minNode = model_values$minNode[k] , 
+                              shrinkage = model_values$shrinkage[k])  
+  }
+  save(err_cv, file="../output/err_cv_baseline2.RData")
 }
 ```
 
