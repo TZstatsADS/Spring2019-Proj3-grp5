@@ -27,8 +27,8 @@ def train(x_train_lr, x_train_hr, epochs, batch_size):
     loss = generated_train.history['loss']
     val_loss = generated_train.history['val_loss']
     
-    generator.save('/content/drive/My Drive/SR_images/model%d.h5', %epochs)
-    generator.save_weights('/content/drive/My Drive/SR_images/weights_model%d.h5', %epochs)
+    generator.save('/content/drive/My Drive/SR_images/model.h5')
+    generator.save_weights('/content/drive/My Drive/SR_images/weights_model.h5')
 
     return generator, generated_train, loss, val_loss
 
