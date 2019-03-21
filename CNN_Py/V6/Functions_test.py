@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
 
 import cv2
 import os 
@@ -11,12 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# In[3]:
-
-
 #path to test images folder
-path = '/home/ed2801/train_img'
-
+#path = '/home/ed2801/train_img'
+path = '/Users/elena/Desktop/AppDS/Project_3_SR/Spyder_local_project'
 
 # In[4]:
 
