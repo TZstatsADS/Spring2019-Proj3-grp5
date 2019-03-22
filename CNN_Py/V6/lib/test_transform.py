@@ -26,7 +26,7 @@ def test_image_decomposition(image, input_size):
     return cubic_sequence, xn, xy
 
 
-c = test_image_decomposition(LR, input_size=16)
+
 
 def divide_chunks(decomposed_list, chunk_size): 
     for i in range(0, len(decomposed_list), chunk_size):  
@@ -42,7 +42,7 @@ def text_image_composition(reconstructed_image_decomposed, chunk_size_xy):
     return whole_image
 
 
-c = test_image_decomposition(LR, input_size=16)
-c1 = text_image_composition(c[0], c[2])
+#c = test_image_decomposition(LR, input_size=16)
+#c1 = text_image_composition(c[0], c[2])
 
-plt.imshow(c1)
+#plt.imshow(c1)
