@@ -17,9 +17,9 @@ def test_image_decomposition(image, input_size):
     cubic_sequence = []
     xn = 0
     xy = 0
-    for x in range(0,cubic.shape[0]-input_size,input_size):
+    for x in range(0,cubic.shape[0],input_size):
         xn+=1
-        for y in range(0,cubic.shape[1]-input_size,input_size):
+        for y in range(0,cubic.shape[1],input_size):
             patch = cubic[x : x + 16, y : y + 16]
             cubic_sequence.append(patch)
     xy = int(len(cubic_sequence)/xn)
@@ -46,3 +46,4 @@ def text_image_composition(reconstructed_image_decomposed, chunk_size_xy):
 #c1 = text_image_composition(c[0], c[2])
 
 #plt.imshow(c1)
+#line 20, 22 deleted the following: -input_size
