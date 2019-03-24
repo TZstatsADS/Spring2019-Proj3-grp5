@@ -28,8 +28,11 @@ train_LR_dir <- paste(path,train_dir, "LR/", sep="")
 train_HR_dir <- paste(path,train_dir, "HR/", sep="")
 train_label_path <- paste(path,train_dir, "label.csv", sep="") 
 
+length(list.files(train_dir))
 length(list.files(train_LR_dir))
 length(list.files(train_HR_dir))
+list.files("~/Desktop/GR5243 Applied Data Science/Project 3/Spring2019-Proj3-spring2019-proj3-grp5/data/train_set/")
+list.files("../data/train_set/")
 ```
 
 ### Step 1: set up controls for evaluation experiments.
