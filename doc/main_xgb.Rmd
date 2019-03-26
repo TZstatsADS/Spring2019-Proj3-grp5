@@ -11,28 +11,20 @@ Set the working directory to the image folder. Specify the training and the test
 
 ```{r wkdir improved xgb, eval=FALSE}
 set.seed(2019)
-path <- "~/Desktop/GR5243 Applied Data Science/Project 3/Spring2019-Proj3-spring2019-proj3-grp5"
+path = "~/Desktop/GR5243 Applied Data Science/Project 3/Spring2019-Proj3-spring2019-proj3-grp5"
 setwd(path)
 ```
 
 Provide directories for training images. Low-resolution (LR) image set and High-resolution (HR) image set will be in different subfolders. 
 ```{r}
-train_dir <- "../data/train_set/" # This will be modified for different data sets.
+train_dir <- "../data/train_set/" 
 train_LR_dir <- paste(train_dir, "LR/", sep="")
 train_HR_dir <- paste(train_dir, "HR/", sep="")
 train_label_path <- paste(train_dir, "label.csv", sep="") 
 
-
-train_dir <- "/data/train_set/" # This will be modified for different data sets.
-train_LR_dir <- paste(path,train_dir, "LR/", sep="")
-train_HR_dir <- paste(path,train_dir, "HR/", sep="")
-train_label_path <- paste(path,train_dir, "label.csv", sep="") 
-
 length(list.files(train_dir))
 length(list.files(train_LR_dir))
 length(list.files(train_HR_dir))
-list.files("~/Desktop/GR5243 Applied Data Science/Project 3/Spring2019-Proj3-spring2019-proj3-grp5/data/train_set/")
-list.files("../data/train_set/")
 ```
 
 ### Step 1: set up controls for evaluation experiments.
@@ -77,7 +69,7 @@ extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
   + Output: an RData file that contains extracted features and corresponding responses
 
 ```{r feature improved xgb}
-source("../XGB/lib/feature.R")
+source("../lib/feature_xgb.R")
 
 tm_feature_train <- NA
 if(run.feature.train){
@@ -88,8 +80,12 @@ if(run.feature.train){
 
 tm_feature_train
 
-save(dat_train, file="../XGB/output/feature_train.RData")
-load("../XGB/output/feature_train.RData")
+save(dat_train, file="../output/feature_train_xgb.RData")
+
+load("../output/feature_train_xgb.RData")
+feat_train <- dat_train$feature
+label_train <- dat_train$label
+
 ```
 
 
@@ -106,23 +102,25 @@ Call the train model and test model from library.
   + Input: an R object that contains a trained classifier.
   + Output: an R object of response predictions on the test set. If there are multiple classifiers under evaluation, there should be multiple sets of label predictions. 
 ```{r loadlib improved xgb}
-source("../XGB/lib/train.R")
-source("../XGB/lib/test.R")
+source("../lib/train_xgb.R")
+source("../lib/test_xgb.R")
 ```
 
 #### Model selection with cross-validation
 
 * Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
 ```{r runcv improved xgb, message=FALSE, warning=FALSE}
-source("../XGB/lib/cross_validation.R")
+source("../lib/cross_validation_xgb.R")
 if(run.cv){
   err_cv_xgboost <- array(dim=c(length(model_values), 2))
   for(k in 1:length(model_values)){
     cat("Values=", k, "\n")
     err_cv_xgboost[k,] <- cv.function(feat_train, label_train, model_values[k],K)
   }
-  save(err_cv_xgboost, file="../XGB/output/err_cv_xgboost.RData")
+  save(err_cv_xgboost, file="../output/err_cv_xgboost_xgb.RData")
 }
+
+load("../output/err_cv_xgboost_xgb.RData")
 err_cv_xgboost
 ```
 
@@ -131,8 +129,6 @@ err_cv_xgboost
 
 ```{r cv_vis improved xgb}
 if(run.cv){
-  
-  load("../XGB/output/err_cv_xgboost.RData")
   
   plot(model_values, err_cv_xgboost[,1], xlab="Interaction Depth", ylab="CV Error",
        main="Cross Validation Error", type="n", 
@@ -161,7 +157,9 @@ par_best <- list(nr=model_best) #285
 ```{r final_train improved xgb}
 tm_train=NA
 tm_train <- system.time(fit_train <- train(feat_train, label_train,par_best))
-save(fit_train, file="../XGB/output/fit_train_xgboost.RData")
+save(fit_train, file="../output/fit_train_xgboost_xgb.RData")
+
+load("../output/fit_train_xgboost_xgb.RData")
 ```
 
 ### Step 5: Super-resolution for test images
@@ -174,7 +172,7 @@ Feed the final training model with the completely holdout testing data.
   + Output: construct high-resolution versions for each low-resolution test image.
   
 ```{r superresolution improved xgb}
-source("../XGB/lib/superResolution.R")
+source("../lib/superResolution_xgb.R")
 
 test_dir <- "../data/test_set/" # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")  # read LR images
@@ -185,8 +183,7 @@ length(list.files(test_LR_dir))
 
 tm_test=NA
 if(run.test){
-  load(file="../XGB/output/fit_train_xgboost.RData")
-    tm_test.2 <- system.time(superResolution_xgboost2(test_LR_dir, test_HR_dir, fit_train))
+    tm_test <- system.time(superResolution_xgboost(test_LR_dir, test_HR_dir, fit_train))
 }
 ```
 
@@ -198,3 +195,6 @@ cat("Time for constructing training features=", tm_feature_train[1], "s \n")
 #cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
 cat("Time for training model=", tm_train[1], "s \n")
 cat("Time for super-resolution=", tm_test[1], "s \n")
+```
+
+

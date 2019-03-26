@@ -46,6 +46,7 @@ superResolution_xgboost <- function(LR_dir, HR_dir, modelList){
   
   ### Input: a path for low-resolution images + a path for high-resolution images 
   ###        + a list for predictors
+  library("EBImage")
   
   n_files <- length(list.files(LR_dir))
   
