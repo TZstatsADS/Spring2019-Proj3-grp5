@@ -25,9 +25,9 @@ Term: Spring 2019
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) 
 
 
-+ Qiaozhen Ma:
++ Qiaozhen Ma: Designed and trained the baseline model with Xinyi Chen in R. Tuned the minNode, shrinkage, numTrees for the GBM model. Fit the model with different categories and get the psnr and cv-error. 
 
-+ Xinyi Chen:
++ Xinyi Chen: Designed and trained the baseline model with Qiaozhen Ma in R. Tuned the minNode, shrinkage, numTrees for the GBM model. Fit the model with different categories and get the psnr and cv-error. 
 
 + Elena Dubova: Designed, trained and tested CNN model in Python. Tested several cloud environments for the model, including Windows Server 2016, Debian Linux on Google Cloud, Google Colaboratory.
 
