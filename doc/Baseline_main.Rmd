@@ -248,7 +248,7 @@ Visualize cross-validation results for different labels.
 if(run.cv){
   load("../output/err_cv_baseline0.RData")
   plot(1:27, err_cv[,1], xlab="minNode", ylab="CV Error",
-     main="CV Error for BGM with label = 0", type="n",xaxt = "n")
+     main="CV Error for BGM of cars", type="n",xaxt = "n")
   axis(1, at=seq(1,27,by=1), labels=df$minNode)
   points(1:9, err_cv[1:9,1], col="red", pch=16)
   points(10:18, err_cv[10:18,1], col="blue", pch=16)
@@ -262,7 +262,7 @@ if(run.cv){
 if(run.cv){
   load("../output/err_cv_baseline1.RData")
   plot(1:27, err_cv[,1], xlab="minNode", ylab="CV Error",
-     main="CV Error for BGM with label = 1", type="n",xaxt = "n")
+     main="CV Error for BGM of flowers", type="n",xaxt = "n")
   axis(1, at=seq(1,27,by=1), labels=df$minNode)
   points(1:9, err_cv[1:9,1], col="red", pch=16)
   points(10:18, err_cv[10:18,1], col="blue", pch=16)
@@ -271,12 +271,12 @@ if(run.cv){
   legend("topright", legend=paste('numTrees = ', levels(as.factor(df$numTrees)) ), pch=16, col=c("red", "blue", "black"))
 }
 ```
-*stores
+*markets
 ```{r cv_vis}
 if(run.cv){
   load("../output/err_cv_baseline2.RData")
   plot(1:27, err_cv[,1], xlab="minNode", ylab="CV Error",
-     main="CV Error for BGM with label = 2", type="n",xaxt = "n")
+     main="CV Error for BGM of markets", type="n",xaxt = "n")
   axis(1, at=seq(1,27,by=1), labels=df$minNode)
   points(1:9, err_cv[1:9,1], col="red", pch=16)
   points(10:18, err_cv[10:18,1], col="blue", pch=16)
@@ -309,7 +309,7 @@ min(err_cv)
 par_best1
 ```
 
-* Choose the "best" parameter value of "stores"
+* Choose the "best" parameter value of "markets"
 ```{r best_model}
 if(run.cv){
   load("../output/err_cv_baseline2.RData")
