@@ -31,9 +31,9 @@ Term: Spring 2019
 
 + Elena Dubova: Designed, trained and tested CNN model in Python. Tested several cloud environments for the model, including Windows Server 2016, Debian Linux on Google Cloud, Google Colaboratory.
 
-+ Caihui Xiao: 
++ Caihui Xiao: Designed and trained the XGBoost model with  Xinyi Hu in R. Tuned the depths and learning rate of XGBoost model.  Check the reproducibility of CNN.
 
-+ Xinyi Hu: Designed and trained the XGBoost model with Caihui Xiao in R. Tuned the depths of XGBoost model. Predicted the whole 1500 low resolution images using XGBoost model and output its mean psnr value. Edited the project summary in README.md.
++ Xinyi Hu: Designed and trained the XGBoost model with Caihui Xiao in R. Tuned the depths and learning rate of XGBoost model. Predicted the whole 1500 low resolution images using XGBoost model and output its mean psnr value. Edited the project summary in README.md.
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
