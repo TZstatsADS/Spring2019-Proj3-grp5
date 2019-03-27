@@ -19,7 +19,7 @@ Term: Spring 2019
 
 + We created three models for image super resolution. The first model is the baseline model -- Gradient Boosting Machines. Then we built XGBoost model and CNN model to further improve image resolution . 
 
-+ The baseline model has mean psnr = 25.82641. The XGBoost model has mean psnr = 25.61457 and the CNN model has mean psnr = 27.08050. CNN model provides mean psnr = 27.0 on 55 epochs with batch size of 150. It processes 1500 test images in 19 mins on a GPU - enabled virtual machine in Google Colaboratory. After comparing the performances of XGBoost model and CNN model, our team decided to run the CNN model during the presentation as it costs much less time to run and gives us the best result that we could have.
++ The baseline model has mean psnr = 25.82641. The XGBoost model has mean psnr = 25.61457. CNN model provides mean psnr = 27.0 on 55 epochs with batch size of 150. It processes 1500 test images in 19 mins on a GPU - enabled virtual machine in Google Colaboratory. After comparing the performances of XGBoost model and CNN model, our team decided to run the CNN model during the presentation as it costs much less time to run and gives us the best result that we could have.
 		
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) 
@@ -33,7 +33,7 @@ Term: Spring 2019
 
 + Caihui Xiao: 
 
-+ Xinyi Hu: Designed and wrote the XGBoost model with Caihui Xiao by using R. Trained the XGBoost model and tuned the depths of XGBoost model. Refined the code structures in R. Predicted the whole 1500 low resolution images using XGBoost model and output its mean psnr value. Edited the project summary in README.md.
++ Xinyi Hu: Designed and trained the XGBoost model with Caihui Xiao in R. Tuned the depths of XGBoost model. Predicted the whole 1500 low resolution images using XGBoost model and output its mean psnr value. Edited the project summary in README.md.
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
