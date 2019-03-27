@@ -29,7 +29,7 @@ feature <- function(LR_dir, HR_dir, n_points=1000){
   }
   
   library("EBImage")
-  n_files <- length(list.files(LR_dir))
+  n_files <- length(list.files(LR_dir))   #######################
   #n_files <- 250 
   
   ### store feature and responses
@@ -37,7 +37,8 @@ feature <- function(LR_dir, HR_dir, n_points=1000){
   labMat <- array(NA, c(n_files * n_points, 4, 3))   # n_files * n_points rows by 4 cols
   
   ### read LR/HR image pairs
-  for(i in 1:n_files){
+  for(i in 1:n_files){  ######################
+  
     imgLR <- as.array(readImage(paste0(LR_dir,  "img_", sprintf("%04d", i), ".jpg")))
     imgHR <- as.array(readImage(paste0(HR_dir,  "img_", sprintf("%04d", i), ".jpg")))
     

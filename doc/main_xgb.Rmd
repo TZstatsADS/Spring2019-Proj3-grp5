@@ -21,10 +21,6 @@ train_dir <- "../data/train_set/"
 train_LR_dir <- paste(train_dir, "LR/", sep="")
 train_HR_dir <- paste(train_dir, "HR/", sep="")
 train_label_path <- paste(train_dir, "label.csv", sep="") 
-
-length(list.files(train_dir))
-length(list.files(train_LR_dir))
-length(list.files(train_HR_dir))
 ```
 
 ### Step 1: set up controls for evaluation experiments.
@@ -48,7 +44,7 @@ run.feature.test=TRUE # process features for test set
 Using cross-validation or independent test set evaluation, we compare the performance of models with different specifications. In this example, we use GBM with different `depth`. In the following chunk, we list, in a vector, setups (in this case, `depth`) corresponding to models that we will compare. In your project, you might compare very different classifiers. You can assign them numerical IDs and labels specific to your project. 
 
 ```{r model_setup improved xgb}
-model_values <- c(270,285,300) ### Tuning values
+model_values <- c(10,20,30)
 model_labels = paste("XG Boosting with nrounds =", model_values)
 ```
 
@@ -81,11 +77,6 @@ if(run.feature.train){
 tm_feature_train
 
 save(dat_train, file="../output/feature_train_xgb.RData")
-
-load("../output/feature_train_xgb.RData")
-feat_train <- dat_train$feature
-label_train <- dat_train$label
-
 ```
 
 
@@ -111,16 +102,16 @@ source("../lib/test_xgb.R")
 * Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
 ```{r runcv improved xgb, message=FALSE, warning=FALSE}
 source("../lib/cross_validation_xgb.R")
+
 if(run.cv){
   err_cv_xgboost <- array(dim=c(length(model_values), 2))
   for(k in 1:length(model_values)){
     cat("Values=", k, "\n")
     err_cv_xgboost[k,] <- cv.function(feat_train, label_train, model_values[k],K)
   }
-  save(err_cv_xgboost, file="../output/err_cv_xgboost_xgb.RData")
+  save(err_cv_xgboost, file="../output/err_cv_xgb.RData")
 }
 
-load("../output/err_cv_xgboost_xgb.RData")
 err_cv_xgboost
 ```
 
@@ -129,6 +120,7 @@ err_cv_xgboost
 
 ```{r cv_vis improved xgb}
 if(run.cv){
+  load("../output/err_cv_xgb.RData")
   
   plot(model_values, err_cv_xgboost[,1], xlab="Interaction Depth", ylab="CV Error",
        main="Cross Validation Error", type="n", 
@@ -139,7 +131,7 @@ if(run.cv){
   arrows(model_values, err_cv_xgboost[,1]-err_cv_xgboost[,2], model_values, err_cv_xgboost[,1]+err_cv_xgboost[,2], 
         length=0.1, angle=90, code=3)
 }
-# Average cv error and cv SD
+
 apply(err_cv_xgboost, 2, mean)
 ```
 
@@ -150,16 +142,15 @@ model_best=model_values[1]
 if(run.cv){
   model_best <- model_values[which.min(err_cv_xgboost[,1])]
 }
-par_best <- list(nr=model_best) #285
+par_best <- list(nr=model_best) 
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
 ```{r final_train improved xgb}
 tm_train=NA
 tm_train <- system.time(fit_train <- train(feat_train, label_train,par_best))
-save(fit_train, file="../output/fit_train_xgboost_xgb.RData")
+save(fit_train, file="../output/fit_train_xgb.RData")
 
-load("../output/fit_train_xgboost_xgb.RData")
 ```
 
 ### Step 5: Super-resolution for test images
@@ -173,18 +164,19 @@ Feed the final training model with the completely holdout testing data.
   
 ```{r superresolution improved xgb}
 source("../lib/superResolution_xgb.R")
+load("../output/fit_train_xgb.RData")
 
 test_dir <- "../data/test_set/" # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")  # read LR images
 test_HR_dir <- paste(test_dir, "HR/", sep="")  # store resoluted images
-length(list.files(test_LR_dir))
-#all.img = 
-#test.img = all.img[sample(50:length(all.img), size = 5, replace = F)]
 
 tm_test=NA
 if(run.test){
+    
     tm_test <- system.time(superResolution_xgboost(test_LR_dir, test_HR_dir, fit_train))
+
 }
+save(tm_test, file="../output/SuperResolution_output.RData")
 ```
 
 ### Summarize Running Time

@@ -44,12 +44,18 @@ train = function(dat_train, label_train, par=NULL){
     ## fit the model
     cat("Classifer =", i, "\n")
     train.xgb = xgb.DMatrix(featMat, label =labMat)
-    #xgb_model = xgboost(data = train.xgb, booster = "gblinear", seed = 1, nrounds = nr, verbose = FALSE, 
-     #                      objective = "reg:linear", eval_metric = "rmse", lambda = 1, 
-      #                     alpha = 0)
-    xgb_model = xgboost(data = train.xgb,booster = "gblinear", seed = 1, nrounds = nr,  
-                        objective = "reg:linear", eval_metric = "rmse", lambda = 1, 
-                        alpha = 0,nfold =3,max_depth = 6, min_child_weight =6,gamma= 0.2, print_every_n = FALSE)
+    
+    xgb_model = xgboost(data = train.xgb, booster = "gblinear", seed = 1, nrounds = nr, verbose = FALSE, 
+                           objective = "reg:linear", eval_metric = "rmse", lambda = 1, 
+                           alpha = 0)
+    #xgb_model = xgboost(data = train.xgb,booster = "gblinear", seed = 1, nrounds = nr,  
+     #                   objective = "reg:linear", eval_metric = "rmse", lambda = 1, 
+      #                  alpha = 0,nfold =3,max_depth = 6, min_child_weight =6,gamma= 0.2)
+   
+     #xgb_model = xgboost(data = train.xgb,booster = "gblinear", seed = 1, nrounds = nr,  
+      #                  objective = "reg:linear", eval_metric = "rmse",nfold =3,max_depth = 6,
+       #                 min_child_weight =6,gamma= 0.2,alpha = 0,
+        #                lambda = 0)
     
     modelList[[i]] = list(fit=xgb_model, iter=par)
   }
