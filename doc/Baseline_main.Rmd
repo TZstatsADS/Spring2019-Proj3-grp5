@@ -1,6 +1,7 @@
 ---
 title: "Baseline_main"
-output: html_document
+output:
+  html_notebook
 ---
 
 ```{r setup, include=FALSE}
@@ -175,7 +176,7 @@ Call the train model and test model from library.
 
 `train.R` and `test.R` should be wrappers for all your model training steps and your classification/prediction steps. 
 + `train.R`
-  + Input: a path that points to the training set features and responses.
+  + Input: training set features and responses.
   + Output: an RData file that contains trained classifiers in the forms of R objects: models/settings/links to external trained configurations.
 + `test.R`
   + Input: a path that points to the test set features.
@@ -188,9 +189,10 @@ source("../lib/test_baseline.R")
 
 
 #### Model selection with cross-validation
-* Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
-If the interaction depth for GBM is large, it is time consuming, we set depth = 1.
-```{r runcv, message=FALSE, warning=FALSE}
+* Do model selection by choosing among different values of training model parameters.
+If the interaction depth for GBM is large, it is time consuming, even though we can get better results, we set depth = 1.
+We tried different values of numTrees, minNode, shrinkage for GBM with different labels in this section. It cost nearly 32 hours to select parameters for GBM.
+```{r runcv0, message=FALSE, warning=FALSE}
 source("../lib/cross_validation_baseline.R")
 
 if(run.cv){
@@ -208,7 +210,7 @@ if(run.cv){
 }
 ```
 
-```{r runcv, message=FALSE, warning=FALSE}
+```{r runcv1, message=FALSE, warning=FALSE}
 if(run.cv){
   err_cv <- array(dim=c(nrow(model_values), 2))
   for(k in 1:nrow(model_values)){
@@ -225,7 +227,7 @@ if(run.cv){
 ```
 
 
-```{r runcv, message=FALSE, warning=FALSE}
+```{r runcv2, message=FALSE, warning=FALSE}
 if(run.cv){
   err_cv <- array(dim=c(nrow(model_values), 2))
   for(k in 1:nrow(model_values)){
@@ -241,13 +243,89 @@ if(run.cv){
 }
 ```
 
+Visualize cross-validation results for different labels.
+*cars
+```{r cv_vis0}
+if(run.cv){
+  load("../output/err_cv_baseline0.RData")
+  plot(1:27, err_cv[,1], xlab="minNode", ylab="CV Error",
+     main="CV Error for BGM of cars", type="n",xaxt = "n")
+  axis(1, at=seq(1,27,by=1), labels=df$minNode)
+  points(1:9, err_cv[1:9,1], col="red", pch=16)
+  points(10:18, err_cv[10:18,1], col="blue", pch=16)
+  points(19:27, err_cv[19:27,1], col="brown", pch=16)
+  lines(1:27, err_cv[,1], col="black", type = 'b')
+  legend("topright", legend=paste('numTrees = ', levels(as.factor(df$numTrees)) ), pch=16, col=c("red", "blue", "black"))
+}
+```
+*flowers
+```{r cv_vis1}
+if(run.cv){
+  load("../output/err_cv_baseline1.RData")
+  plot(1:27, err_cv[,1], xlab="minNode", ylab="CV Error",
+     main="CV Error for BGM of flowers", type="n",xaxt = "n")
+  axis(1, at=seq(1,27,by=1), labels=df$minNode)
+  points(1:9, err_cv[1:9,1], col="red", pch=16)
+  points(10:18, err_cv[10:18,1], col="blue", pch=16)
+  points(19:27, err_cv[19:27,1], col="brown", pch=16)
+  lines(1:27, err_cv[,1], col="black", type = 'b')
+  legend("topright", legend=paste('numTrees = ', levels(as.factor(df$numTrees)) ), pch=16, col=c("red", "blue", "black"))
+}
+```
+*markets
+```{r cv_vis2}
+if(run.cv){
+  load("../output/err_cv_baseline2.RData")
+  plot(1:27, err_cv[,1], xlab="minNode", ylab="CV Error",
+     main="CV Error for BGM of markets", type="n",xaxt = "n")
+  axis(1, at=seq(1,27,by=1), labels=df$minNode)
+  points(1:9, err_cv[1:9,1], col="red", pch=16)
+  points(10:18, err_cv[10:18,1], col="blue", pch=16)
+  points(19:27, err_cv[19:27,1], col="brown", pch=16)
+  lines(1:27, err_cv[,1], col="black", type = 'b')
+  legend("topright", legend=paste('numTrees = ', levels(as.factor(df$numTrees)) ), pch=16, col=c("red", "blue", "black"))
+}
+```
+* Choose the "best" parameter value of "cars"
+```{r best_model0}
+if(run.cv){
+  load("../output/err_cv_baseline0.RData")
+  model_best <- model_values[which.min(err_cv[,1]),]
+}
+par_best0 <- list(depth = 1, numTrees = model_best$numTrees, minNode = model_best$minNode,  shrinkage=model_best$shrinkage)
+min(err_cv[,1])
+20 * log10(1) - 10 * log10(min(err_cv[,1]))
+par_best0
+```
+* Choose the "best" parameter value of "flowers"
+```{r best_model1}
+if(run.cv){
+  load("../output/err_cv_baseline1.RData")
+  model_best <- model_values[which.min(err_cv[,1]),]
+}
+par_best1 <- list(depth = 1, numTrees = model_best$numTrees, minNode = model_best$minNode,  shrinkage=model_best$shrinkage)
 
-
-```{r}
-
+min(err_cv)
+20 * log10(1) - 10 * log10(min(err_cv[,1]))
+par_best1
 ```
 
-```{r}
+* Choose the "best" parameter value of "markets"
+```{r best_model2}
+if(run.cv){
+  load("../output/err_cv_baseline2.RData")
+  model_best <- model_values[which.min(err_cv[,1]),]
+}
+par_best2 <- list(depth = 1, numTrees = model_best$numTrees, minNode = model_best$minNode,  shrinkage=model_best$shrinkage)
 
+min(err_cv[,1])
+
+20 * log10(1) - 10 * log10(min(err_cv[,1]))
+
+par_best2
 ```
+From the results of different data set, we can abtain that there are different best parameter values for three kinds of photos. 
+
+For data labeled "flowers", GBM model has best performance with PSNR 27.92.
+
 
