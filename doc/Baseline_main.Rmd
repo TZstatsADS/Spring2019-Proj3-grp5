@@ -70,9 +70,9 @@ df <- data.frame(matrix(ncol = 3, nrow = 27))
 x <- c("numTrees", "minNode", "shrinkage")
 colnames(df) <- x
 
-numTrees = seq(80, 100, 10) 
-minNode = seq(30, 50, 10)
-shrinkage = seq(0.16, 0.2, 0.02)
+numTrees = sep(80,100,10) 
+minNode = sep(30,50,10)
+shrinkage = sep(0.16,0.2,0.02)
 
 
 df$numTrees <- rep(numTrees, each = length(minNode)*length(shrinkage))
@@ -328,4 +328,45 @@ From the results of different data set, we can abtain that there are different b
 
 For data labeled "flowers", GBM model has best performance with PSNR 27.92.
 
+```{r}
+par_best <- list(depth = 1, numTrees = 100, minNode = 50,  shrinkage=0.2)
+source("../lib/train_baseline.R")
+tm_train=NA
+tm_train <- system.time(fit_train <- train(dat_train_all$feature, dat_train_all$label, par_best))#, par_best
+save(fit_train, file="../output/fit_train_baseline.RData")
+```
 
+
+### Step 5: Super-resolution for test images
+Feed the final training model with the completely holdout testing data. 
++ `superResolution.R`
+  + Input: a path that points to the folder of low-resolution test images.
+  + Input: a path that points to the folder (empty) of high-resolution test images.
+  + Input: an R object that contains tuned predictors.
+  + Output: construct high-resolution versions for each low-resolution test image.
+```{r superresolution}
+source("../lib/superResolution.R")
+source("../lib/test_baseline.R")
+test_dir <- "../data/test_set/" # This will be modified for different data sets.
+test_LR_dir <- paste(test_dir, "LR/", sep="")
+test_HR_dir <- paste(test_dir, "HR/", sep="")
+
+tm_test=NA
+if(run.test){
+  load(file="../output/fit_train_baseline.RData")
+  tm_test <- system.time(superResolution(test_LR_dir, test_HR_dir, fit_train))
+}
+```
+
+### Summarize Running Time
+Prediction performance matters, so does the running times for constructing features and for training the model, especially when the computation resource is limited. 
+```{r running_time}
+load("../output/err_cv_baseline.RData")
+mse_baseline <- err_cv[which.min(err_cv[,1]),1]
+PSNR_baseline <- 20 * log10(1) - 10 * log10(mse_baseline)
+mse_baseline
+PSNR_baseline
+
+cat("Time for training model=", tm_train[1], "s \n")
+cat("Time for super-resolution=", tm_test[1], "s \n")
+```
